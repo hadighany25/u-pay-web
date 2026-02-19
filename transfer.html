@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transfer Money - U-Pay</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Kantumruy+Pro:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+      /* BASE STYLES (Cleaned Up) */
+      body {
+        background-color: #f2f4f6;
+        margin: 0;
+        font-family: "Inter", "Kantumruy Pro", sans-serif;
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .kh-font * {
+        font-family: "Kantumruy Pro", sans-serif !important;
+      }
+
+      .app-container {
+        width: 100%;
+        max-width: 450px;
+        background: white;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+      }
+
+      .nav-header {
+        padding: 20px;
+        background: #004d40;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 1.1rem;
+      }
+      .nav-header a {
+        color: white;
+        text-decoration: none;
+      }
+
+      .transfer-form {
+        padding: 25px;
+        flex: 1;
+      }
+
+      .receiver-box {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 20px;
+        border: 1px dashed #ccc;
+      }
+      .receiver-icon {
+        width: 70px;
+        height: 70px;
+        background: #e0f2f1;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #004d40;
+        font-size: 1.8rem;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+        position: relative;
+      }
+      .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .main-input {
+        width: 100%;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        font-size: 1rem;
+        outline: none;
+        background: #fff;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+      }
+      .main-input[readonly] {
+        background-color: #e9ecef;
+        color: #6c757d;
+        cursor: not-allowed;
+      }
+
+      .check-status {
+        position: absolute;
+        right: 15px;
+        top: 42px;
+        font-size: 0.9rem;
+        font-weight: bold;
+      }
+      .status-ok {
+        color: #00b894;
+      }
+      .status-err {
+        color: #e74c3c;
+      }
+
+      .confirm-btn {
+        width: 100%;
+        padding: 15px;
+        background: #004d40;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        box-shadow: 0 5px 15px rgba(0, 77, 64, 0.2);
+        transition: 0.3s;
+      }
+      .confirm-btn:active {
+        transform: scale(0.98);
+      }
+
+      /* PIN MODAL */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      .pin-box {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .pin-digit {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        text-align: center;
+        border-radius: 10px;
+        border: 2px solid white;
+        background: transparent;
+        color: white;
+        outline: none;
+      }
+
+      /* 🔥 NEW PROFESSIONAL SLIP STYLES (Copied from Dashboard) */
+      .slip-container {
+        width: 340px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        animation: slideUp 0.4s ease-out;
+      }
+      @keyframes slideUp {
+        from {
+          transform: translateY(50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .slip-header {
+        background: #004d40;
+        padding: 25px 20px 30px;
+        text-align: center;
+        color: white;
+        position: relative;
+      }
+      .slip-status-icon {
+        width: 60px;
+        height: 60px;
+        background: white;
+        color: #004d40;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin: 0 auto 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+      .slip-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-top: 5px;
+      }
+      .slip-amount {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 5px 0 0;
+        letter-spacing: -1px;
+      }
+
+      .slip-body {
+        padding: 20px 25px;
+        background: white;
+        position: relative;
+      }
+
+      .dashed-line {
+        margin: 15px -25px;
+        border-top: 2px dashed #ddd;
+        position: relative;
+      }
+      .dashed-line::before,
+      .dashed-line::after {
+        content: "";
+        position: absolute;
+        top: -10px;
+        width: 20px;
+        height: 20px;
+        background: rgba(0, 0, 0, 0.85);
+        border-radius: 50%;
+      }
+      .dashed-line::before {
+        left: -10px;
+      }
+      .dashed-line::after {
+        right: -10px;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+        font-size: 0.9rem;
+      }
+      .d-label {
+        color: #888;
+        font-weight: 500;
+      }
+      .d-value {
+        font-weight: 700;
+        color: #1f2937;
+        text-align: right;
+        max-width: 60%;
+        word-break: break-word;
+      }
+      .d-mono {
+        font-family: "Courier New", monospace;
+        letter-spacing: 0.5px;
+        color: #004d40;
+        font-weight: bold;
+      }
+
+      /* QR Footer */
+      .slip-footer-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 10px;
+      }
+      .qr-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid #eee;
+        padding: 5px 10px;
+        border-radius: 10px;
+        background: #f9fafb;
+      }
+      .qr-img {
+        width: 45px;
+        height: 45px;
+      }
+      .qr-text {
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: #004d40;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
+      .footer-logo {
+        width: 80px;
+      }
+
+      /* Footer Actions (Circles) */
+      .slip-actions {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        padding: 25px;
+        background: #fff;
+        border-top: 1px solid #f0f0f0;
+      }
+      .action-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: 0.2s;
+        color: #004d40;
+      }
+      .action-item:hover {
+        opacity: 0.8;
+        transform: translateY(-2px);
+      }
+      .action-circle {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        border: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        background: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        color: #004d40;
+      }
+      .action-text {
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+      .action-circle.done {
+        background: #f0fdf4;
+        border-color: #004d40;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <div class="nav-header">
+        <a href="dashboard.html"><i class="fa-solid fa-arrow-left"></i></a>
+        <span>Transfer Money</span>
+      </div>
+
+      <div class="transfer-form">
+        <div class="receiver-box">
+          <div class="receiver-icon"><i class="fa-solid fa-user"></i></div>
+          <h3
+            id="displayReceiverName"
+            style="margin: 0; color: #004d40; min-height: 24px"
+          >
+            ...
+          </h3>
+          <p style="margin: 5px 0 0; color: #888; font-size: 0.9rem">
+            Receiver
+          </p>
+        </div>
+
+        <div class="input-group">
+          <label>Receiver Account</label>
+          <input
+            type="number"
+            id="receiverAcc"
+            class="main-input"
+            placeholder="Enter Account Number"
+            oninput="resetCheck()"
+            onblur="checkName()"
+          />
+          <span id="nameCheck" class="check-status"></span>
+        </div>
+
+        <div class="input-group">
+          <label>Amount ($)</label>
+          <input
+            type="number"
+            id="amount"
+            class="main-input"
+            placeholder="0.00"
+          />
+        </div>
+
+        <div class="input-group">
+          <label>Remark</label>
+          <input
+            type="text"
+            id="remark"
+            class="main-input"
+            placeholder="Optional"
+          />
+        </div>
+
+        <button onclick="validateAndOpenPin()" class="confirm-btn">
+          Transfer Now
+        </button>
+      </div>
+    </div>
+
+    <div id="pinModal" class="modal-overlay">
+      <h3 style="color: white; margin-bottom: 10px">Enter PIN</h3>
+      <div class="pin-box">
+        <input
+          type="password"
+          class="pin-digit"
+          maxlength="1"
+          id="p1"
+          oninput="moveFocus(this, 'p2')"
+        />
+        <input
+          type="password"
+          class="pin-digit"
+          maxlength="1"
+          id="p2"
+          oninput="moveFocus(this, 'p3')"
+        />
+        <input
+          type="password"
+          class="pin-digit"
+          maxlength="1"
+          id="p3"
+          oninput="moveFocus(this, 'p4')"
+        />
+        <input
+          type="password"
+          class="pin-digit"
+          maxlength="1"
+          id="p4"
+          oninput="submitPin()"
+        />
+      </div>
+      <button
+        onclick="closeModal('pinModal')"
+        style="
+          margin-top: 30px;
+          background: none;
+          border: none;
+          color: white;
+          cursor: pointer;
+        "
+      >
+        Cancel
+      </button>
+    </div>
+
+    <div id="slipModal" class="modal-overlay">
+      <div id="captureArea" class="slip-container">
+        <div class="slip-header">
+          <div class="slip-status-icon"><i class="fa-solid fa-check"></i></div>
+          <div class="slip-title">Transfer Successful</div>
+          <div class="slip-amount" id="slipAmount">$0.00</div>
+        </div>
+
+        <div class="slip-body">
+          <div class="detail-row">
+            <span class="d-label">Trx ID</span>
+            <span class="d-value d-mono" id="slipRef">...</span>
+          </div>
+          <div class="detail-row">
+            <span class="d-label">Hash</span>
+            <span class="d-value d-mono" id="slipHash" style="font-size: 0.8rem"
+              >...</span
+            >
+          </div>
+
+          <div class="dashed-line"></div>
+
+          <div class="detail-row">
+            <span class="d-label">From</span>
+            <span class="d-value" id="slipSender">...</span>
+          </div>
+          <div class="detail-row">
+            <span class="d-label">To</span>
+            <span class="d-value" id="slipReceiver">...</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="d-label">Payment Via</span>
+            <span class="d-value" id="slipMethod">Account Input</span>
+          </div>
+          <div class="detail-row">
+            <span class="d-label">Date</span>
+            <span class="d-value" id="slipDate">...</span>
+          </div>
+          <div class="detail-row">
+            <span class="d-label">Fee</span>
+            <span class="d-value">$0.00</span>
+          </div>
+          <div class="detail-row">
+            <span class="d-label">Remark</span>
+            <span class="d-value" id="slipRemark">...</span>
+          </div>
+
+          <div class="slip-footer-info">
+            <div class="qr-box">
+              <img
+                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Verify"
+                class="qr-img"
+              />
+              <div class="qr-text">
+                <span>SCAN TO</span>
+                <span>CHECK</span>
+              </div>
+            </div>
+            <img src="images/logo.png" class="footer-logo" />
+          </div>
+        </div>
+
+        <div class="slip-actions">
+          <div class="action-item" onclick="saveSlipImage()">
+            <div class="action-circle done">
+              <i class="fa-solid fa-share-nodes"></i>
+            </div>
+            <span class="action-text">Share</span>
+          </div>
+
+          <div class="action-item" onclick="location.reload()">
+            <div class="action-circle done">
+              <i class="fa-solid fa-rotate-right"></i>
+            </div>
+            <span class="action-text">New Trx</span>
+          </div>
+
+          <div
+            class="action-item"
+            onclick="window.location.href = 'dashboard.html'"
+          >
+            <div class="action-circle done">
+              <i class="fa-solid fa-xmark"></i>
+            </div>
+            <span class="action-text">Done</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user) window.location.href = "index.html";
+
+      // 1. AUTO FILL & LOCK LOGIC
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("acc")) {
+        const accInput = document.getElementById("receiverAcc");
+        accInput.value = urlParams.get("acc");
+        accInput.setAttribute("readonly", true);
+        checkName();
+      }
+      if (urlParams.get("amount")) {
+        const amtInput = document.getElementById("amount");
+        amtInput.value = urlParams.get("amount");
+        if (urlParams.get("lockAmount") === "true") {
+          amtInput.setAttribute("readonly", true);
+          amtInput.style.backgroundColor = "#e9ecef";
+        }
+      }
+
+      async function checkName() {
+        const acc = document.getElementById("receiverAcc").value;
+        const nameDisplay = document.getElementById("displayReceiverName");
+        const status = document.getElementById("nameCheck");
+
+        if (acc.length < 9) {
+          nameDisplay.innerText = "...";
+          status.innerText = "";
+          return false;
+        }
+
+        try {
+          const res = await fetch("/api/check-account", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ accountNumber: acc }),
+          });
+          const data = await res.json();
+          if (data.success) {
+            nameDisplay.innerText = data.username;
+            status.innerText = "✔ Valid";
+            status.className = "check-status status-ok";
+            return true;
+          } else {
+            nameDisplay.innerText = "Unknown";
+            status.innerText = "✘ Not Found";
+            status.className = "check-status status-err";
+            return false;
+          }
+        } catch (error) {
+          return false;
+        }
+      }
+
+      function resetCheck() {
+        document.getElementById("displayReceiverName").innerText = "...";
+        document.getElementById("nameCheck").innerText = "";
+      }
+
+      async function validateAndOpenPin() {
+        const amount = parseFloat(document.getElementById("amount").value);
+        if (!amount || amount <= 0)
+          return Swal.fire("Warning", "Please enter valid amount", "warning");
+        if (amount > user.balance)
+          return Swal.fire("Error", "Insufficient Balance", "error");
+
+        const isValidReceiver = await checkName();
+        if (!isValidReceiver) {
+          const statusText = document.getElementById("nameCheck").innerText;
+          if (statusText.includes("Not Found"))
+            return Swal.fire("Error", "Receiver Not Found", "error");
+        }
+
+        document.getElementById("pinModal").style.display = "flex";
+        ["p1", "p2", "p3", "p4"].forEach(
+          (id) => (document.getElementById(id).value = ""),
+        );
+        document.getElementById("p1").focus();
+      }
+
+      function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+      }
+      function moveFocus(c, n) {
+        if (c.value.length >= 1) document.getElementById(n).focus();
+      }
+
+      async function submitPin() {
+        const pin =
+          document.getElementById("p1").value +
+          document.getElementById("p2").value +
+          document.getElementById("p3").value +
+          document.getElementById("p4").value;
+
+        // 🔥 Determine Payment Via
+        const method =
+          urlParams.get("source") === "qr" ? "QR Scan" : "Account Input";
+
+        if (pin.length === 4) {
+          closeModal("pinModal");
+          Swal.fire({
+            title: "Processing...",
+            didOpen: () => Swal.showLoading(),
+          });
+
+          const res = await fetch("/api/transfer", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              senderUsername: user.username,
+              receiverAccount: document.getElementById("receiverAcc").value,
+              amount: document.getElementById("amount").value,
+              remark: document.getElementById("remark").value,
+              pin: pin,
+              trxMethod: method,
+            }),
+          });
+          const data = await res.json();
+          Swal.close();
+
+          if (data.success) {
+            user.balance = data.newBalance;
+            localStorage.setItem("user", JSON.stringify(user));
+            new Audio(
+              "https://notificationsounds.com/storage/sounds/file-sounds-1148-juntos.mp3",
+            ).play();
+
+            // 🔥 POPULATE NEW SLIP DATA
+            document.getElementById("slipAmount").innerText =
+              "$" + Math.abs(data.slipData.amount).toFixed(2);
+            document.getElementById("slipRef").innerText = data.slipData.refId;
+            document.getElementById("slipHash").innerText =
+              data.slipData.hash || "N/A";
+
+            document.getElementById("slipSender").innerText = user.username;
+            document.getElementById("slipReceiver").innerText =
+              data.slipData.partner || data.slipData.receiverName;
+
+            document.getElementById("slipMethod").innerText =
+              data.slipData.trxMethod || method;
+            document.getElementById("slipDate").innerText = data.slipData.date;
+            document.getElementById("slipRemark").innerText =
+              data.slipData.remark || "-";
+
+            document.getElementById("slipModal").style.display = "flex";
+          } else {
+            Swal.fire("Failed", data.message, "error");
+          }
+        }
+      }
+
+      function saveSlipImage() {
+        // Hide Actions before capture
+        document.querySelector(".slip-actions").style.display = "none";
+        html2canvas(document.getElementById("captureArea")).then((canvas) => {
+          const link = document.createElement("a");
+          link.download = `Slip-${Date.now()}.png`;
+          link.href = canvas.toDataURL();
+          link.click();
+          // Show again
+          document.querySelector(".slip-actions").style.display = "flex";
+        });
+      }
+
+      if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark-mode");
+        document.write(
+          "<style>body { background-color: #121212 !important; color: white !important; } .app-container { background-color: #121212 !important; } .receiver-box { background-color: #1e1e1e !important; border-color: #333; } .main-input { background: #333 !important; color: white !important; border-color:#444; } .slip-container { background: #fff !important; } </style>",
+        );
+      }
+    </script>
+  </body>
+</html>

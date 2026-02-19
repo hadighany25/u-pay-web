@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings - U-Pay</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      /* 🔥 PREMIUM FONT SETUP */
+      :root {
+        --font-main: "Inter", "Kantumruy Pro", sans-serif;
+        --max-width: 450px; /* កំណត់ទំហំឱ្យដូចទូរស័ព្ទ */
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font-main);
+        background: #eef2f6; /* ពណ៌ background ក្រៅ App (សម្រាប់ Desktop) */
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* 🔥 MOBILE CONTAINER (ធ្វើឱ្យដូចទូរស័ព្ទ) */
+      .app-container {
+        width: 100%;
+        max-width: var(--max-width);
+        background: #f3f4f6; /* ពណ៌ background ក្នុង App */
+        min-height: 100vh;
+        position: relative;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.1); /* ដាក់ស្រមោលឱ្យដឹងថាជា App */
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 90px; /* ទុកកន្លែងឱ្យ Nav */
+      }
+
+      /* Fix Font in Inputs */
+      input,
+      button,
+      select,
+      textarea {
+        font-family: var(--font-main) !important;
+      }
+
+      /* DARK MODE */
+      body.dark-mode {
+        background: #000;
+      } /* ខាងក្រៅខ្មៅ */
+      body.dark-mode .app-container {
+        background: #121212;
+        color: #e0e0e0;
+        box-shadow: 0 0 40px rgba(255, 255, 255, 0.05);
+      }
+
+      /* HEADER */
+      .header {
+        background: linear-gradient(135deg, #004d40, #00695c);
+        color: white;
+        padding: 40px 20px 90px 20px;
+        border-radius: 0 0 35px 35px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 77, 64, 0.3);
+      }
+      .header h2 {
+        margin: 0;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+
+      /* PROFILE CARD */
+      .profile-section {
+        margin-top: -65px;
+        padding: 0 20px;
+      }
+      .profile-card {
+        background: white;
+        border-radius: 24px;
+        padding: 30px 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        position: relative;
+        transition: 0.3s;
+      }
+      body.dark-mode .profile-card {
+        background: #1e1e1e;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .profile-img-container {
+        position: relative;
+        width: 90px;
+        height: 90px;
+        margin: 0 auto 15px auto;
+      }
+      .profile-img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+      }
+      body.dark-mode .profile-img {
+        border-color: #2d2d2d;
+      }
+
+      .edit-icon {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: #004d40;
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        cursor: pointer;
+        border: 3px solid white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      body.dark-mode .edit-icon {
+        border-color: #1e1e1e;
+        background: #10b981;
+      }
+
+      .user-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+        letter-spacing: -0.5px;
+      }
+      body.dark-mode .user-name {
+        color: white;
+      }
+      .user-phone {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-top: 5px;
+        font-weight: 500;
+      }
+
+      /* SETTINGS LIST */
+      .settings-group {
+        margin: 25px 20px;
+      }
+      .group-title {
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 700;
+        margin-bottom: 12px;
+        margin-left: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      body.dark-mode .group-title {
+        color: #94a3b8;
+      }
+
+      .setting-wrapper {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+      }
+      body.dark-mode .setting-wrapper {
+        background: #1e1e1e;
+      }
+
+      .setting-item {
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #f1f5f9;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      body.dark-mode .setting-item {
+        border-color: #333;
+      }
+      .setting-item:last-child {
+        border-bottom: none;
+      }
+      .setting-item:active {
+        background: #f8fafc;
+        transform: scale(0.98);
+      }
+      body.dark-mode .setting-item:active {
+        background: #2a2a2a;
+      }
+
+      .setting-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-weight: 600;
+        font-size: 1rem;
+        color: #334155;
+      }
+      body.dark-mode .setting-left {
+        color: #e2e8f0;
+      }
+
+      .setting-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: #e0f2f1;
+        color: #004d40;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+      }
+      body.dark-mode .setting-icon {
+        background: #2d2d2d;
+        color: #10b981;
+      }
+
+      /* LOGOUT */
+      .logout-btn {
+        margin: 30px 20px;
+        background: white;
+        color: #ef4444;
+        text-align: center;
+        padding: 16px;
+        border-radius: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.1);
+        border: 1px solid transparent;
+      }
+      .logout-btn:active {
+        transform: scale(0.97);
+      }
+      body.dark-mode .logout-btn {
+        background: #2a1515;
+        color: #ff6b6b;
+        border-color: #451a1a;
+        box-shadow: none;
+      }
+
+      /* 🔥 FIXED BOTTOM NAV (Centered) */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%); /* Center the fixed nav */
+        width: 100%;
+        max-width: var(--max-width); /* Match container width */
+        background: white;
+        padding: 12px 0 20px 0;
+        display: flex;
+        justify-content: space-around;
+        box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+        border-radius: 25px 25px 0 0;
+      }
+      body.dark-mode .bottom-nav {
+        background: #1e1e1e;
+        box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+      }
+      .nav-item {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 0.75rem;
+        text-decoration: none;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .nav-item i {
+        font-size: 1.4rem;
+        display: block;
+        margin-bottom: 6px;
+      }
+      .nav-item.active {
+        color: #004d40;
+        font-weight: 700;
+        transform: translateY(-5px);
+      }
+      body.dark-mode .nav-item.active {
+        color: #10b981;
+      }
+
+      /* SWITCH */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #cbd5e1;
+        transition: 0.4s;
+        border-radius: 34px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+      input:checked + .slider {
+        background-color: #004d40;
+      }
+      body.dark-mode input:checked + .slider {
+        background-color: #10b981;
+      }
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <div class="header">
+        <h2 data-lang="title">Settings</h2>
+      </div>
+
+      <div class="profile-section">
+        <div class="profile-card">
+          <div class="profile-img-container" onclick="changeImage()">
+            <img id="u-img" src="images/logo.png" class="profile-img" />
+            <div class="edit-icon"><i class="fa-solid fa-camera"></i></div>
+          </div>
+          <h3 id="u-name" class="user-name">Loading...</h3>
+          <p id="u-phone" class="user-phone">Loading...</p>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="group-title" data-lang="sec_general">General</div>
+        <div class="setting-wrapper">
+          <div class="setting-item">
+            <div class="setting-left">
+              <div
+                class="setting-icon"
+                style="color: #0ea5e9; background: #e0f2fe"
+              >
+                <i class="fa-solid fa-moon"></i>
+              </div>
+              <span data-lang="dark_mode">Dark Mode</span>
+            </div>
+            <label class="switch">
+              <input
+                type="checkbox"
+                id="darkModeToggle"
+                onchange="toggleDarkMode()"
+              />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item" onclick="toggleLang()">
+            <div class="setting-left">
+              <div
+                class="setting-icon"
+                style="color: #8b5cf6; background: #ede9fe"
+              >
+                <i class="fa-solid fa-language"></i>
+              </div>
+              <span data-lang="language">Language</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span
+                id="currentLang"
+                style="font-size: 0.9rem; color: #64748b; font-weight: 600"
+                >EN</span
+              >
+              <i
+                class="fa-solid fa-rotate"
+                style="color: #cbd5e1; font-size: 0.9rem"
+                id="langIcon"
+              ></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="group-title" data-lang="sec_security">Security</div>
+        <div class="setting-wrapper">
+          <div class="setting-item" onclick="changePassword()">
+            <div class="setting-left">
+              <div class="setting-icon"><i class="fa-solid fa-lock"></i></div>
+              <span data-lang="change_pass">Change Password</span>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: #cbd5e1"></i>
+          </div>
+          <div class="setting-item" onclick="changePin()">
+            <div class="setting-left">
+              <div class="setting-icon"><i class="fa-solid fa-key"></i></div>
+              <span data-lang="change_pin">Change PIN</span>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: #cbd5e1"></i>
+          </div>
+          <div class="setting-item">
+            <div class="setting-left">
+              <div
+                class="setting-icon"
+                style="color: #f59e0b; background: #fef3c7"
+              >
+                <i class="fa-solid fa-fingerprint"></i>
+              </div>
+              <span data-lang="biometric">Biometric Login</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="bioToggle" onchange="toggleBio()" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="group-title" data-lang="sec_limits">Limits</div>
+        <div class="setting-wrapper">
+          <div class="setting-item" onclick="changeLimit()">
+            <div class="setting-left">
+              <div
+                class="setting-icon"
+                style="color: #ef4444; background: #fee2e2"
+              >
+                <i class="fa-solid fa-chart-pie"></i>
+              </div>
+              <span data-lang="trx_limit">Transaction Limit</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span
+                id="userLimitDisplay"
+                style="font-size: 0.9rem; color: #64748b; font-weight: 700"
+                >$1,000</span
+              >
+              <i
+                class="fa-solid fa-pen"
+                style="color: #cbd5e1; font-size: 0.8rem"
+              ></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="logout-btn" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span data-lang="logout">Log Out</span>
+      </div>
+
+      <div class="bottom-nav">
+        <a href="dashboard.html" class="nav-item"
+          ><i class="fa-solid fa-house"></i> Home</a
+        >
+        <a href="scan.html" class="nav-item"
+          ><i class="fa-solid fa-qrcode"></i> Scan</a
+        >
+        <a href="dashboard.html" class="nav-item"
+          ><i class="fa-solid fa-clock-rotate-left"></i> History</a
+        >
+        <div class="nav-item active">
+          <i class="fa-solid fa-gear"></i> Settings
+        </div>
+      </div>
+    </div>
+    <script>
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user) window.location.href = "index.html";
+
+      // INIT
+      document.getElementById("u-name").innerText =
+        user.fullName || user.username;
+      document.getElementById("u-phone").innerText =
+        user.phone || "No Phone Number";
+      document.getElementById("u-img").src =
+        user.profileImage || "images/logo.png";
+      document.getElementById("userLimitDisplay").innerText =
+        "$" + (user.trxLimit || 1000).toLocaleString();
+
+      // 1. LANGUAGE
+      const translations = {
+        en: {
+          title: "Settings",
+          sec_general: "General",
+          dark_mode: "Dark Mode",
+          language: "Language",
+          sec_security: "Security",
+          change_pass: "Change Password",
+          change_pin: "Change PIN",
+          biometric: "Biometric Login",
+          sec_limits: "Limits",
+          trx_limit: "Transaction Limit",
+          logout: "Log Out",
+        },
+        kh: {
+          title: "ការកំណត់",
+          sec_general: "ទូទៅ",
+          dark_mode: "ម៉ូដងងឹត",
+          language: "ភាសា",
+          sec_security: "សុវត្ថិភាព",
+          change_pass: "ប្ដូរពាក្យសម្ងាត់",
+          change_pin: "ប្ដូរលេខ PIN",
+          biometric: "ស្កេនម្រាមដៃ",
+          sec_limits: "ដែនកំណត់",
+          trx_limit: "ដែនកំណត់ការវេរ",
+          logout: "ចាកចេញ",
+        },
+      };
+      let currentLang = localStorage.getItem("lang") || "en";
+      applyLang(currentLang);
+
+      function toggleLang() {
+        document.getElementById("langIcon").style.transform = "rotate(360deg)";
+        setTimeout(
+          () =>
+            (document.getElementById("langIcon").style.transform =
+              "rotate(0deg)"),
+          500,
+        );
+        currentLang = currentLang === "en" ? "kh" : "en";
+        localStorage.setItem("lang", currentLang);
+        applyLang(currentLang);
+      }
+
+      function applyLang(lang) {
+        document.getElementById("currentLang").innerText =
+          lang === "en" ? "English" : "ភាសាខ្មែរ";
+        document.querySelectorAll("[data-lang]").forEach((el) => {
+          const key = el.getAttribute("data-lang");
+          if (translations[lang][key]) el.innerText = translations[lang][key];
+        });
+        // 🔥 FONT FIX
+        if (lang === "kh") {
+          document.body.style.fontFamily = "'Kantumruy Pro', sans-serif";
+        } else {
+          document.body.style.fontFamily =
+            "'Inter', 'Kantumruy Pro', sans-serif";
+        }
+      }
+
+      // 2. DARK MODE
+      if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark-mode");
+        document.getElementById("darkModeToggle").checked = true;
+      }
+      function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+        localStorage.setItem(
+          "darkMode",
+          document.body.classList.contains("dark-mode"),
+        );
+      }
+
+      // 3. BIOMETRIC
+      if (localStorage.getItem("useBiometric") === "true")
+        document.getElementById("bioToggle").checked = true;
+      function toggleBio() {
+        localStorage.setItem(
+          "useBiometric",
+          document.getElementById("bioToggle").checked,
+        );
+      }
+
+      // 4. CHANGE PASS
+      async function changePassword() {
+        const { value: formValues } = await Swal.fire({
+          title: currentLang === "en" ? "Change Password" : "ប្ដូរពាក្យសម្ងាត់",
+          html: '<input id="oldPass" class="swal2-input" type="password" placeholder="Current Password"><input id="newPass" class="swal2-input" type="password" placeholder="New Password">',
+          focusConfirm: false,
+          showCancelButton: true,
+          confirmButtonColor: "#004d40",
+          preConfirm: () => [
+            document.getElementById("oldPass").value,
+            document.getElementById("newPass").value,
+          ],
+        });
+        if (formValues) {
+          const [old, newP] = formValues;
+          if (!old || !newP)
+            return Swal.fire("Error", "Please fill all fields", "warning");
+          Swal.showLoading();
+          try {
+            const res = await fetch("/api/user/change-password", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                id: user.id,
+                oldPassword: old,
+                newPassword: newP,
+              }),
+            });
+            const data = await res.json();
+            if (data.success) {
+              user.password = newP; // Local update
+              localStorage.setItem("user", JSON.stringify(user));
+              Swal.fire("Success", "Password Updated!", "success").then(() =>
+                logout(),
+              );
+            } else Swal.fire("Error", data.message, "error");
+          } catch (e) {
+            Swal.fire("Error", "Connection failed", "error");
+          }
+        }
+      }
+
+      // 5. CHANGE PIN
+      async function changePin() {
+        const { value: formValues } = await Swal.fire({
+          title: currentLang === "en" ? "Change PIN" : "ប្ដូរលេខ PIN",
+          html: '<input id="pinPass" class="swal2-input" type="password" placeholder="Verify Password"><input id="newPin" class="swal2-input" type="password" maxlength="4" placeholder="New 4-Digit PIN">',
+          focusConfirm: false,
+          showCancelButton: true,
+          confirmButtonColor: "#004d40",
+          preConfirm: () => [
+            document.getElementById("pinPass").value,
+            document.getElementById("newPin").value,
+          ],
+        });
+        if (formValues) {
+          const [pass, pin] = formValues;
+          if (!pass || !pin)
+            return Swal.fire("Error", "Please fill all fields", "warning");
+          if (pin.length !== 4)
+            return Swal.fire("Error", "PIN must be 4 digits", "warning");
+          Swal.showLoading();
+          try {
+            const res = await fetch("/api/user/change-pin", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                id: user.id,
+                password: pass,
+                newPin: pin,
+              }),
+            });
+            const data = await res.json();
+            if (data.success) {
+              user.pin = pin;
+              localStorage.setItem("user", JSON.stringify(user));
+              Swal.fire("Success", "PIN Updated!", "success");
+            } else Swal.fire("Error", data.message, "error");
+          } catch (e) {
+            Swal.fire("Error", "Connection failed", "error");
+          }
+        }
+      }
+
+      // 6. CHANGE LIMIT
+      async function changeLimit() {
+        const { value: formValues } = await Swal.fire({
+          title: currentLang === "en" ? "Set Limit" : "កំណត់ដែនកំណត់",
+          html: '<input id="limitPass" class="swal2-input" type="password" placeholder="Verify Password"><input id="newLimit" class="swal2-input" type="number" placeholder="Amount (e.g. 5000)">',
+          focusConfirm: false,
+          showCancelButton: true,
+          confirmButtonColor: "#004d40",
+          preConfirm: () => [
+            document.getElementById("limitPass").value,
+            document.getElementById("newLimit").value,
+          ],
+        });
+        if (formValues) {
+          const [pass, lim] = formValues;
+          if (!pass || !lim)
+            return Swal.fire("Error", "Fill all fields", "warning");
+          try {
+            const res = await fetch("/api/change-limit", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                username: user.username,
+                password: pass,
+                newLimit: lim,
+              }),
+            });
+            const data = await res.json();
+            if (data.success) {
+              user.trxLimit = parseFloat(lim);
+              localStorage.setItem("user", JSON.stringify(user));
+              document.getElementById("userLimitDisplay").innerText =
+                "$" + user.trxLimit.toLocaleString();
+              Swal.fire("Success", "Limit Updated!", "success");
+            } else Swal.fire("Error", data.message, "error");
+          } catch (e) {
+            Swal.fire("Error", "Connection failed", "error");
+          }
+        }
+      }
+
+      // 7. UPLOAD PROFILE
+      async function changeImage() {
+        const { value: url } = await Swal.fire({
+          title: "Update Profile Photo",
+          input: "text",
+          inputPlaceholder: "Paste Image URL here...",
+          showCancelButton: true,
+          confirmButtonColor: "#004d40",
+        });
+        if (url) {
+          const res = await fetch("/api/user/update-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: user.id, imageUrl: url }),
+          });
+          if ((await res.json()).success) {
+            user.profileImage = url;
+            localStorage.setItem("user", JSON.stringify(user));
+            document.getElementById("u-img").src = url;
+            Swal.fire("Updated", "", "success");
+          }
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem("user");
+        window.location.href = "index.html";
+      }
+    </script>
+  </body>
+</html>
